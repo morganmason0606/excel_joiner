@@ -1,27 +1,30 @@
-import React, { Fragment} from 'react';
+import React, { Fragment, useEffect} from 'react';
 
 function ExcelPicker({ sheets, sheetColMap, setSheetColMap }) {
-    const keys = Array.from(sheets.keys())
-    const keyColMap = new Map()  
-    for (const key of keys){
-        keyColMap.set(key,  Object.keys(sheets.get(key)[0]))
-     }
+    const sheetNames = Array.from(sheets.keys())
+    const keyColMap = new Map(
+        sheetNames.map(sheetName=>
+        [sheetName, sheets.get(sheetName)[0]]
+        )
+    )
+
+    useEffect(()=>console.log(sheetColMap))
 
     return (
         <>
             <h3>Select Column to join on</h3>
             {
-                keys.map((key, ind) => {
+                sheetNames.map((sheetName, ind) => {
                     return( 
-                    <Fragment key={key}>
-                        <p>{key}</p>
+                    <Fragment key={`picking${sheetName}`}>
+                        <p>{sheetName}</p>
                         <select
-                            onChange={e => setSheetColMap(new Map(sheetColMap).set(key, e.target.value))}
+                            onChange={e => setSheetColMap(new Map(sheetColMap).set(sheetName, e.target.value))}
                         >
                             {
-                                keyColMap.get(key).map((val, ind)=>{
+                                keyColMap.get(sheetName).map((val, ind)=>{
                                     return(
-                                        <option key={val} value={val}>{val}</option>
+                                        <option key={val} value={ind}>{val}</option>
                                     )
                                 })
                             }

@@ -14,26 +14,31 @@ function Excel() {
 	const [curState, setCurState] = useState(STATES.upload)
 	//curState: STATES
 	const [sheets, setSheets] = useState(new Map());
-	//sheets: map<sheetName, array_of_rows[{columnHeader: row_value_under_columnHeader}}]>
+	//sheets: map<sheetName, array of arrays(row 0 is headers)>
 	const [sheetColMap, setSheetColMap] = useState(new Map())
-	//sheetColMap: map<sheetName, columHeader_to_join_on>
+	//sheetColMap: map<sheetName, index of column to join on>
+	const [joinedRows, setJoinedRows] = useState(new Array())
+	//array of map: index is row, map is sheet name, index to join on
 
 
 	const handleFileUpload = (e) => {
 		const file = e.target.files[0];
 		const reader = new FileReader();
 		const sheetMap = new Map();
+		const colMap = new Map()
 		reader.onload = (event) => {
 			const workbook = XLSX.read(event.target.result, { type: 'binary' });
 
 			for (const sheetName of workbook.SheetNames) {
 				const sheet = workbook.Sheets[sheetName];
-				const sheetData = XLSX.utils.sheet_to_json(sheet);
+				const sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 				if (sheetData !== undefined && sheetData.length > 0) {
 					sheetMap.set(sheetName, sheetData);
+					colMap.set(sheetName, 0)
 				}
 			}
 			setSheets(sheetMap);
+			setSheetColMap(new Map(colMap));
 		};
 
 		try {
@@ -47,9 +52,9 @@ function Excel() {
 		<>
 			{
 				(curState === STATES.upload) ? (
-				<>
-				<input type="file" onChange={handleFileUpload} />
-				</>) :
+					<>
+						<input type="file" onChange={handleFileUpload} />
+					</>) :
 					(curState === STATES.pick) ? (
 						<>
 							<ExcelPicker sheets={sheets} sheetColMap={sheetColMap} setSheetColMap={setSheetColMap} />
