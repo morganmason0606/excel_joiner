@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/excel_joiner/static/css/main.679f9873.css",
-    "main.js": "/excel_joiner/static/js/main.08dab7fa.js",
+    "main.css": "/excel_joiner/static/css/main.4429f793.css",
+    "main.js": "/excel_joiner/static/js/main.21595c13.js",
     "static/js/453.8d144b09.chunk.js": "/excel_joiner/static/js/453.8d144b09.chunk.js",
     "static/media/logo.svg": "/excel_joiner/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
     "index.html": "/excel_joiner/index.html",
-    "main.679f9873.css.map": "/excel_joiner/static/css/main.679f9873.css.map",
-    "main.08dab7fa.js.map": "/excel_joiner/static/js/main.08dab7fa.js.map",
+    "main.4429f793.css.map": "/excel_joiner/static/css/main.4429f793.css.map",
+    "main.21595c13.js.map": "/excel_joiner/static/js/main.21595c13.js.map",
     "453.8d144b09.chunk.js.map": "/excel_joiner/static/js/453.8d144b09.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.679f9873.css",
-    "static/js/main.08dab7fa.js"
+    "static/css/main.4429f793.css",
+    "static/js/main.21595c13.js"
   ]
 }
