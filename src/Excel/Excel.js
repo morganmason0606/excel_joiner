@@ -1,12 +1,22 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import * as XLSX from 'xlsx';
 import ExcelPicker from './ExcelPicker';
 import ExcelTable from './ExcelTable';
 
+// enum
+const STATES = {
+	upload: "upload",
+	pick: "pick",
+	table: "table"
+}
+
 function Excel() {
-	const [curState, setCurState] = useState("upload")
+	const [curState, setCurState] = useState(STATES.upload)
+	//curState: STATES
 	const [sheets, setSheets] = useState(new Map());
+	//sheets: map<sheetName, array_of_rows[{columnHeader: row_value_under_columnHeader}}]>
 	const [sheetColMap, setSheetColMap] = useState(new Map())
+	//sheetColMap: map<sheetName, columHeader_to_join_on>
 
 
 	const handleFileUpload = (e) => {
@@ -27,8 +37,8 @@ function Excel() {
 		};
 
 		try {
-			reader.readAsBinaryString(file);
-			setCurState("pick");
+			reader.readAsArrayBuffer(file);
+			setCurState(STATES.pick);
 		} catch { };
 
 	};
@@ -36,19 +46,22 @@ function Excel() {
 	return (
 		<>
 			{
-			(curState === "upload")?(<input type="file" onChange={handleFileUpload} />):
-			(curState === "pick")?(
-			<>
-				<ExcelPicker sheets={sheets} sheetColMap={sheetColMap} setSheetColMap={setSheetColMap} />
-				<br/>
-				<button type="button" onClick={()=>(setCurState("table"))}>Continue to picking tables</button>
-			</>):
-			(curState==="table")?(
-			<>
-				<ExcelTable sheets={sheets} sheetColMap={sheetColMap}/>
-			</>):
-			(<p>error</p>)
-			}			
+				(curState === STATES.upload) ? (
+				<>
+				<input type="file" onChange={handleFileUpload} />
+				</>) :
+					(curState === STATES.pick) ? (
+						<>
+							<ExcelPicker sheets={sheets} sheetColMap={sheetColMap} setSheetColMap={setSheetColMap} />
+							<br />
+							<button type="button" onClick={() => (setCurState(STATES.table))}>Continue to picking tables</button>
+						</>) :
+						(curState === STATES.table) ? (
+							<>
+								<ExcelTable sheets={sheets} sheetColMap={sheetColMap} />
+							</>) :
+							(<p>error</p>)
+			}
 		</>
 	);
 }
