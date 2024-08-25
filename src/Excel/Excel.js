@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import * as XLSX from 'xlsx';
 import ExcelPicker from './ExcelPicker';
 import ExcelTable from './ExcelTable';
-
+import ExcelTableClass from './ExcelTableClass'
 // enum
 const STATES = {
 	upload: "upload",
@@ -17,10 +17,8 @@ function Excel() {
 	//sheets: map<sheetName, array of arrays(row 0 is headers)>
 	const [sheetColMap, setSheetColMap] = useState(new Map())
 	//sheetColMap: map<sheetName, index of column to join on>
-	const [joinedRows, setJoinedRows] = useState(new Array())
+	const [joinedRows, setJoinedRows] = useState([])
 	//array of map: index is row, map is sheet name, index to join on
-
-
 	const handleFileUpload = (e) => {
 		const file = e.target.files[0];
 		const reader = new FileReader();
@@ -63,7 +61,7 @@ function Excel() {
 						</>) :
 						(curState === STATES.table) ? (
 							<>
-								<ExcelTable sheets={sheets} sheetColMap={sheetColMap} />
+								<ExcelTableClass sheets={sheets} sheetColMap={sheetColMap} joinedRows={joinedRows} setJoinedRows={setJoinedRows}/>
 							</>) :
 							(<p>error</p>)
 			}

@@ -1,8 +1,8 @@
-import "./RowBox.css"
-export default function RowBox({sheetName, name, ind}){
-    return (
-        <td key={`${sheetName}?${name}`} className="box" onClick={()=>console.log(sheetName,name,ind)}>
-            {name}
-        </td>
-    )
+export default class Cell{
+    constructor(content, sheetName, index){
+        this.content = content;
+        this.sheetName = sheetName;
+        this.index = index; 
+        this.selected=false
+    }
 }

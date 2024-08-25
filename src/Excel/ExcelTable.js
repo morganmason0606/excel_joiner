@@ -1,81 +1,119 @@
-import { useEffect, useState } from "react"
+import { Fragment, useEffect, useState } from "react"
 
-export default function ExcelTable({ sheets, sheetColMap }) {
+export default function ExcelTable({ sheets, sheetColMap, joinedRows, setJoinedRows }) {
     const [maxLen, setMaxLen] = useState(0);
     const [selRows, setSelRows] = useState(new Map());
+    const [inputName, setInputName] = useState("")
+
     useEffect(() => {
         setMaxLen(Math.max(...[...sheets.keys()].map(sheetName => sheets.get(sheetName).length)));
     }, [sheets])
 
 
-    const handleSelect=(e, sheetName, ind)=>{
-        if (selRows.get(sheetName) === ind){
+    const handleSelect = (e, sheetName, ind) => {
+        if (selRows.get(sheetName) === ind) {
             const nMap = new Map(selRows)
             nMap.delete(sheetName)
             setSelRows(new Map(nMap))
-        }else{
+        } else {
             setSelRows(new Map(selRows).set(sheetName, ind))
         }
     }
 
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const new_arr = [...joinedRows, { name: inputName, cols: new Map(selRows) }]
+        setJoinedRows(new_arr);
+        setInputName("");
+        setSelRows(new Map());
+        
+    }
+    const asdf = () => {
+        console.log('hi')
+        
+        console.log(typeof(joinedRows[0]))
+        console.log(joinedRows)
+    }
     return (
         <>
-            <p>{maxLen}</p>
+            <button onClick={asdf}>asdf</button>
             <table>
                 <thead>
                     <th>
                         Select cells and Join
-                        <input type="text" placeholder="new column name"/>
-                        <button>Join Selected Rows</button>
-                        </th>
+                        <form onSubmit={handleSubmit}>
+
+                            <input type="text" placeholder="new column name" value={inputName} onChange={(e) => setInputName(e.target.value)} />
+                            <button type='submit'>Join Selected Rows</button>
+                        </form>
+                    </th>
                     {[...sheets.keys()].map(sheetName => <th>{sheetName}</th>)}
                 </thead>
-                <tr>
+                <tbody>
+                    {
+                        joinedRows.map((row, ind) =>
+                            
+                            <tr key={`joined:${row.name}${ind}`}>
+                                <td>{row.name}</td>
+                                {
+                                    [...sheets.keys()].map(sheetName =>
+                                        (row.cols.has(sheetName)) ? (
+                                            <td>{sheets.get(sheetName)[row.cols.get(sheetName)][sheetColMap.get(sheetName)]}</td >
+                                        ) : (
+                                            <td></td>
+                                        )
+                                    )
+                                }
+                            </tr>
+                        )
+                    }
 
-                </tr>
-                {
-                    [...Array(maxLen).keys()].map(ind =>
-                        <tr>
-                            <td></td>
-                            {
-                                [...sheets.keys()].map(sheetName =>
-                                    (sheets.get(sheetName).length > ind
-                                        && sheets.get(sheetName)[ind][sheetColMap.get(sheetName)] !== undefined
-                                         && sheets.get(sheetName)[ind][sheetColMap.get(sheetName)] !== null
-                                    ) ? (
-                                        <td 
-                                            key={`${sheetName}_${ind}`}
-                                            onClick={(e)=>handleSelect(e,sheetName, ind)}
-                                            bgcolor={(selRows.get(sheetName) === ind)?('gray'):('white')}
+                </tbody>
+                <tbody>
+                    {
+                        [...Array(maxLen).keys()].map(ind =>
+                            <tr>
+                                <td></td>
+                                {
+                                    [...sheets.keys()].map(sheetName =>
+                                        (sheets.get(sheetName).length > ind
+                                            && sheets.get(sheetName)[ind][sheetColMap.get(sheetName)] !== undefined
+                                            && sheets.get(sheetName)[ind][sheetColMap.get(sheetName)] !== null
+                                        ) ? (
+                                            <td
+                                                key={`${sheetName}_${ind}`}
+                                                onClick={(e) => handleSelect(e, sheetName, ind)}
+                                                bgcolor={(selRows.get(sheetName) === ind) ? ('gray') : ('white')}
                                             >
                                                 {sheets.get(sheetName)[ind][sheetColMap.get(sheetName)]}
-                                        </td>
+                                            </td>
 
-                                        // (selRows.get(sheetName) === ind)?
-                                        // ((<td 
-                                        //     key={`${sheetName}_${ind}`}
-                                        //     onClick={(e)=>handleSelect(e,sheetName, ind)}
-                                        //     bgcolor="gray"
-                                        //     >
-                                        //         {sheets.get(sheetName)[ind][sheetColMap.get(sheetName)]}
-                                        // </td>))
-                                        // :(<td 
-                                        //     key={`${sheetName}_${ind}`}
-                                        //     onClick={(e)=>handleSelect(e,sheetName, ind)}>
-                                        //         {sheets.get(sheetName)[ind][sheetColMap.get(sheetName)]}
-                                        // </td>)
+                                            // (selRows.get(sheetName) === ind)?
+                                            // ((<td 
+                                            //     key={`${sheetName}_${ind}`}
+                                            //     onClick={(e)=>handleSelect(e,sheetName, ind)}
+                                            //     bgcolor="gray"
+                                            //     >
+                                            //         {sheets.get(sheetName)[ind][sheetColMap.get(sheetName)]}
+                                            // </td>))
+                                            // :(<td 
+                                            //     key={`${sheetName}_${ind}`}
+                                            //     onClick={(e)=>handleSelect(e,sheetName, ind)}>
+                                            //         {sheets.get(sheetName)[ind][sheetColMap.get(sheetName)]}
+                                            // </td>)
+                                        )
+
+                                            : (<td></td>)
                                     )
-                                        
-                                        : (<td></td>)
-                                )
-                            }
+                                }
 
-                        </tr>
+                            </tr>
 
-                    )
-                }
-            </table>
-            <p>{ }</p>
+                        )
+                    }
+                </tbody>
+            </table >
             {
 
             }
