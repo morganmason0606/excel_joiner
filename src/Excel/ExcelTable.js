@@ -61,16 +61,17 @@ export default function ExcelTable({ sheets, sheetColMap, joinedRows, setJoinedR
         // Sheetsjs expects an array of arrays
         //aoa[0] should be headers
         //accoplish by making an array of ( keys array from sheets) that are then flatten) 
-        const headers = ["joined header", ...[...sheets.keys()].map(sheetName =>
+        const sheetKeys = [...sheets.keys()]
+        const headers = ["joined header", ...(sheetKeys.map(sheetName =>
             sheets.get(sheetName)[0].map(val => `${sheetName}: ${val}`)
-        ).flat()
+        ).flat())
         ]
         //join data from joined rows
         //like headers, we make an array of sheet row array then flatten it
         //if a column was not selected, we just create a filler array of undefined 
         const data = joinedRows.map(({ name, cols }) => [
             name,
-            ...([...sheets.keys()].map(sheetName =>
+            ...(sheetKeys.map(sheetName =>
                 cols.has(sheetName)
                     ? (sheets.get(sheetName)[cols.get(sheetName).ind])
                     : (Array.apply(null, Array(sheets.get(sheetName)[0].length)).map(function () { return undefined }))
@@ -78,11 +79,28 @@ export default function ExcelTable({ sheets, sheetColMap, joinedRows, setJoinedR
 
         ]
         )
-        const aoa = [headers, ...data]
-        const ws = XLSX.utils.aoa_to_sheet(aoa);
+        const joinedData = [headers, ...data]
+        const ws = XLSX.utils.aoa_to_sheet(joinedData);
+
+        const joinedSheetheader = ['joined name', ...(sheetKeys.map(sheetName => ['rows', sheetName])).flat()]
+        const joinedSheetRows = joinedRows.map(row => [
+            row.name,
+            ...(sheetKeys.map(sheetName => (
+                row.cols.has(sheetName)) ?
+                ([row.cols.get(sheetName).ind + 1, row.cols.get(sheetName).cellVal]) :
+                ([undefined, undefined])
+            ).flat()
+            )
+        ])
+        const joinedSheetData = [joinedSheetheader, ...joinedSheetRows]
+        console.log(joinedSheetheader, joinedSheetRows, joinedSheetData)
+        const ws2 = XLSX.utils.aoa_to_sheet(joinedSheetData)
         /* create workbook and export */
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+        XLSX.utils.book_append_sheet(wb, ws, "Joined Data");
+
+        XLSX.utils.book_append_sheet(wb, ws2, "Joined Rows");
+
         XLSX.writeFile(wb, "joined.xlsx");
 
     }
@@ -94,7 +112,7 @@ export default function ExcelTable({ sheets, sheetColMap, joinedRows, setJoinedR
                 Select cells in the table and join them together using the form in the top left.<br />
                 To select a cell, click on it. The background should turn gray. To unselect a cell, click on it again. It should turn white.<br></br>
                 To join cells together, select the cells you wish to join (you can have an empty row by not selecting any cells). <br></br>
-                &emsp;tip: ctrl-f can be useful for finding keywords on the table<br></br>
+                &emsp;-tip: ctrl-f can be useful for finding keywords on the table<br></br>
                 Then in the top left, create an optional name to join on. Finally, click the Join Selected Rows. <br></br>
                 You should then see the joined row at the top of the table with a blue blackground and the cells previously selected crossed out.<br></br>
                 Note that crossed out cells can still be selected. The crossing out is just to show it has already been joined on. <br></br>
@@ -147,7 +165,7 @@ export default function ExcelTable({ sheets, sheetColMap, joinedRows, setJoinedR
                             //sheet column values
                             [...Array(maxLen).keys()].map(ind =>
                                 <tr>
-                                    <td>row {ind}</td>
+                                    <td>row {ind + 1}</td>
                                     {
                                         [...table.keys()].map(sheetName => //for each sheet
                                             (table.get(sheetName).length > ind
