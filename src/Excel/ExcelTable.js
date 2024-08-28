@@ -82,7 +82,7 @@ export default function ExcelTable({ sheets, sheetColMap, joinedRows, setJoinedR
         const joinedData = [headers, ...data]
         const ws = XLSX.utils.aoa_to_sheet(joinedData);
 
-        const joinedSheetheader = ['joined name', ...(sheetKeys.map(sheetName => ['rows', sheetName])).flat()]
+        const joinedSheetheader = ['joined name', ...(sheetKeys.map(sheetName => ['row number', sheetName])).flat()]
         const joinedSheetRows = joinedRows.map(row => [
             row.name,
             ...(sheetKeys.map(sheetName => (
