@@ -104,6 +104,7 @@ export default function ExcelTable({ sheets, sheetColMap, joinedRows, setJoinedR
         XLSX.writeFile(wb, "joined.xlsx");
 
     }
+
     return (
         <>
             <button onClick={exportSheet}>Export sheet</button>
@@ -121,24 +122,28 @@ export default function ExcelTable({ sheets, sheetColMap, joinedRows, setJoinedR
 
             </p>
             <div>
+                <h3>asdf</h3>
                 <table>
-                    <tr>
-                        {/*sheet Names*/}
-                        <th className="tools-container">
-                            Select cells and Join
-                            <form onSubmit={handleSubmit}>
+                    <thead>
+                        <tr className="followHeader">
+                            {/*sheet Names*/}
+                            <th>
+                                Select cells and Join
+                                <form onSubmit={handleSubmit}>
 
-                                <input type="text" placeholder="new column name" value={inputName} onChange={(e) => setInputName(e.target.value)} />
-                                <button type='submit'>Join Selected Rows</button>
-                            </form>
-                        </th>
-                        {[...sheets.keys()].map(sheetName => <th>{sheetName}</th>)}
-                    </tr>
-                    <tbody>
+                                    <input type="text" placeholder="new column name" value={inputName} onChange={(e) => setInputName(e.target.value)} />
+                                    <button type='submit'>Join Selected Rows</button>
+                                </form>
+                            </th>
+                            {[...sheets.keys()].map(sheetName => <th scope="col">{sheetName}</th>)}
+                        </tr>
+                    </thead>
+
+                    <tbody className="joinedRows">
                         {/* joined values */}
                         {joinedRows.map((row, ind) =>
                             <tr>
-                                <td>
+                                <th scope="row">
                                     <button
                                         onClick={() => {
                                             //filter out selected row and update the row's cells
@@ -151,7 +156,7 @@ export default function ExcelTable({ sheets, sheetColMap, joinedRows, setJoinedR
                                         delete
                                     </button>
                                     {` ${row.name}`}
-                                </td>
+                                </th>
                                 {[...sheets.keys()].map(sheetName =>
                                     (row.cols.has(sheetName)) ?
                                         (<td>{row.cols.get(sheetName).cellVal}</td>) :
@@ -165,7 +170,7 @@ export default function ExcelTable({ sheets, sheetColMap, joinedRows, setJoinedR
                             //sheet column values
                             [...Array(maxLen).keys()].map(ind =>
                                 <tr>
-                                    <td>row {ind + 1}</td>
+                                    <th scope="row">row {ind + 1}</th>
                                     {
                                         [...table.keys()].map(sheetName => //for each sheet
                                             (table.get(sheetName).length > ind

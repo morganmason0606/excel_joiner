@@ -1,4 +1,4 @@
-.tools-container {
+.followHeader {
   position: fixed;
   top: 10px;
   /* Adjust this value as needed */
@@ -13,9 +13,41 @@
 }
 
 @supports (position: sticky) {
-  .tools-container {
+  .followHeader {
     position: sticky;
     top: 10px;
     /* Adjust this value as needed */
   }
+}
+
+
+th,
+td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  vertical-align: top;
+  text-align: left;
+}
+
+table{
+  width: 75%;
+  max-width: 100%;
+  border: 1px solid black;
+  border-collapse: collapse;
+  vertical-align: top;
+  text-align: left;
+}
+.joinedRows {
+  background-color: aquamarine;
+}
+
+.adjustable {
+  resize: horizontal;
+  overflow: auto;
+  display: block;
+}
+td .adjustable{
+  border: 0;
+  width: auto;
+  height: auto;
 }

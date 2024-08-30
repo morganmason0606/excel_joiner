@@ -38,18 +38,7 @@
   }
 }
 
-table,
-th,
-td {
-  border: 1px solid black;
-  vertical-align: top;
-  text-align: left;
-}
 
-tbody {
-  border: 3px solid red;
-  background-color: aquamarine;
-}
 
 .box {
   display: flex
