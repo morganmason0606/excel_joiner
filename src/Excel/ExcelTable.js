@@ -135,7 +135,12 @@ export default function ExcelTable({ sheets, sheetColMap, joinedRows, setJoinedR
                                     <button type='submit'>Join Selected Rows</button>
                                 </form>
                             </th>
-                            {[...sheets.keys()].map(sheetName => <th scope="col">{sheetName}</th>)}
+                            {[...sheets.keys()].map(sheetName =>
+                                <th scope="col">
+                                    <div className="adjustable">
+                                        {sheetName}
+                                    </div>
+                                </th>)}
                         </tr>
                     </thead>
 
@@ -159,8 +164,14 @@ export default function ExcelTable({ sheets, sheetColMap, joinedRows, setJoinedR
                                 </th>
                                 {[...sheets.keys()].map(sheetName =>
                                     (row.cols.has(sheetName)) ?
-                                        (<td>{row.cols.get(sheetName).cellVal}</td>) :
-                                        (<td></td>)
+                                        (<td>
+                                            <div className="adjustable">
+                                                {row.cols.get(sheetName).cellVal}
+                                            </div>
+                                        </td>) :
+                                        (<td>
+                                            <div className="adjustable" />
+                                        </td>)
                                 )}
                             </tr>
                         )}
@@ -185,9 +196,12 @@ export default function ExcelTable({ sheets, sheetColMap, joinedRows, setJoinedR
                                                                 bgcolor={(selRows.get(sheetName) === table.get(sheetName)[ind]) ? ('gray') : ("white")
                                                                 }
                                                             >
-                                                                <s>
-                                                                    {table.get(sheetName)[ind].cellVal}
-                                                                </s>
+                                                                <div className="adjustable" >
+
+                                                                    <s>
+                                                                        {table.get(sheetName)[ind].cellVal}
+                                                                    </s>
+                                                                </div>
                                                             </td>
                                                         ) : ( // if not selected, display as normal
                                                             <td
@@ -195,11 +209,16 @@ export default function ExcelTable({ sheets, sheetColMap, joinedRows, setJoinedR
                                                                 bgcolor={(selRows.get(sheetName) === table.get(sheetName)[ind]) ? ('gray') : ("white")
                                                                 }
                                                             >
-                                                                {table.get(sheetName)[ind].cellVal}
+                                                                <div className="adjustable" >
+
+                                                                    {table.get(sheetName)[ind].cellVal}
+                                                                </div>
                                                             </td>
                                                         )
                                                 ) : ( // if no value, just empty
-                                                    <td></td>
+                                                    <td>
+                                                        <div className="adjustable" />
+                                                    </td>
                                                 )
                                         )
                                     }

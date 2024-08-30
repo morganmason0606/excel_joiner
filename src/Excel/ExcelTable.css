@@ -21,33 +21,38 @@
 }
 
 
-th,
-td {
-  border: 1px solid black;
+table {
   border-collapse: collapse;
-  vertical-align: top;
-  text-align: left;
+  border-spacing: 0px;
 }
-
-table{
-  width: 75%;
-  max-width: 100%;
+th, td {
   border: 1px solid black;
-  border-collapse: collapse;
-  vertical-align: top;
-  text-align: left;
+  padding: 0;
+  margin: 0px;
+  overflow: auto;
 }
 .joinedRows {
   background-color: aquamarine;
 }
 
+
+
 .adjustable {
   resize: horizontal;
   overflow: auto;
-  display: block;
+  text-overflow: clip;
+  width: 120px;
+  height: 120px;
+  margin: 0px;
+  padding: 0px;
+  /* border: 1px solid black; */
+  display:block;
 }
-td .adjustable{
+th .adjustable, 
+td .adjustable {
   border: 0;
   width: auto;
   height: auto;
+  min-height: 20px;
+  min-width: 20px;
 }
