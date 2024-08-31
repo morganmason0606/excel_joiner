@@ -60,6 +60,7 @@ td .adjustable {
 table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: auto;
 }
 
 th, td {

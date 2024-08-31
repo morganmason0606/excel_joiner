@@ -1,4 +1,4 @@
-import { useEffect,  useState } from "react"
+import { useEffect, useState } from "react"
 import * as XLSX from 'xlsx';
 import "./ExcelTable.css"
 
@@ -12,6 +12,8 @@ export default function ExcelTable({ sheets, sheetColMap, joinedRows, setJoinedR
 
 
     const [columnWidths, setColumnWidths] = useState([...sheets.keys()].map(sheetName => 200))
+    // const [isResizing, setIsResizing] = useState(false);
+
 
 
     //set up table data 
@@ -100,7 +102,6 @@ export default function ExcelTable({ sheets, sheetColMap, joinedRows, setJoinedR
             )
         ])
         const joinedSheetData = [joinedSheetheader, ...joinedSheetRows]
-        console.log(joinedSheetheader, joinedSheetRows, joinedSheetData)
         const ws2 = XLSX.utils.aoa_to_sheet(joinedSheetData)
         /* create workbook and export */
         const wb = XLSX.utils.book_new();
@@ -112,22 +113,27 @@ export default function ExcelTable({ sheets, sheetColMap, joinedRows, setJoinedR
 
     }
 
+
     const handleMouseDown = (index, event) => {
-        console.log('down', index)
+        event.preventDefault()
+        // setIsResizing(true);
         const startX = event.clientX;
         const startWidth = columnWidths[index];
 
         const onMouseMove = (event) => {
-            console.log('move', index, event.clientX)
-            document.body.style.cursor = 'col-resize';
+            event.preventDefault()
+            // console.log(isResizing)
+            // if (!isResizing) return;
+            const deltaX = event.clientX - startX;
             const newWidths = [...columnWidths];
-            newWidths[index] = Math.max(startWidth + event.clientX - startX, 50); // Ensure a minimum width
+            newWidths[index] = Math.max(startWidth + deltaX, 50); // Ensure a minimum width
             setColumnWidths(newWidths);
         };
 
         const onMouseUp = () => {
-            console.log('up', index)
-            document.body.style.cursor = '';
+            event.preventDefault()
+
+            // setIsResizing(false);
             window.removeEventListener('mousemove', onMouseMove);
             window.removeEventListener('mouseup', onMouseUp);
         };
@@ -157,7 +163,7 @@ export default function ExcelTable({ sheets, sheetColMap, joinedRows, setJoinedR
                     <thead>
                         <tr className="followHeader">
                             {/*sheet Names*/}
-                            <th>
+                            <th style={{width:"10%"}}>
                                 Select cells and Join
                                 <form onSubmit={handleSubmit}>
 
@@ -167,24 +173,30 @@ export default function ExcelTable({ sheets, sheetColMap, joinedRows, setJoinedR
                             </th>
                             {[...sheets.keys()].map((sheetName, index) =>
                                 <th
+                                    key={`th${sheetName}`}
                                     scope="col"
-                                    style={{ width: columnWidths[index] + 'px' }}>
+                                    style={
+                                        {
+                                            width: columnWidths[index] + 'px',
+                                            position: 'relative',
+                                        }
+                                    }>
                                     {sheetName}
                                     <div
                                         style={{
-                                            display: 'inline-block',
-                                            width: '10px',
                                             position: 'absolute',
-                                            right: 0,
                                             top: 0,
+                                            right: 0,
                                             bottom: 0,
+                                            width: '5px',
+                                            cursor: 'col-resize',
+                                            zIndex: 1,
                                         }}
                                         onMouseDown={(event) => handleMouseDown(index, event)}
                                     />
                                 </th>)}
                         </tr>
                     </thead>
-
                     <tbody className="joinedRows">
                         {/* joined values */}
                         {joinedRows.map((row, ind) =>
@@ -204,7 +216,13 @@ export default function ExcelTable({ sheets, sheetColMap, joinedRows, setJoinedR
                                     {` ${row.name}`}
                                 </th>
                                 {[...sheets.keys()].map((sheetName, index) =>
-                                    <td style={{ width: columnWidths[index], wordBreak: 'break-word' }}>
+                                    <td
+                                        style={
+                                            {
+                                                width: columnWidths[index],
+                                                wordBreak: 'break-word'
+                                            }}
+                                    >
                                         {
                                             (row.cols.has(sheetName)) ?
                                                 (row.cols.get(sheetName).cellVal) :
@@ -233,19 +251,19 @@ export default function ExcelTable({ sheets, sheetColMap, joinedRows, setJoinedR
                                                         bgcolor={(selRows.get(sheetName) === table.get(sheetName)[ind]) ? ('gray') : ("white")}
                                                     >
                                                         {
-                                                        (table.get(sheetName)[ind].selected !== 0) ? //if we have already selected, cross it out
-                                                            (
-                                                                <s>
-                                                                    {table.get(sheetName)[ind].cellVal}
-                                                                </s>
+                                                            (table.get(sheetName)[ind].selected !== 0) ? //if we have already selected, cross it out
+                                                                (
+                                                                    <s>
+                                                                        {table.get(sheetName)[ind].cellVal}
+                                                                    </s>
 
-                                                            ) : ( // if not selected, display as normal
-                                                                table.get(sheetName)[ind].cellVal 
-                                                            )
+                                                                ) : ( // if not selected, display as normal
+                                                                    table.get(sheetName)[ind].cellVal
+                                                                )
                                                         }
                                                     </td>
                                                 ) : ( // if no value, just empty
-                                                    <td style={{ width: columnWidths[index], wordBreak: 'break-word' }}/>
+                                                    <td style={{ width: columnWidths[index], wordBreak: 'break-word' }} />
                                                 )
 
 
