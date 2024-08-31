@@ -20,7 +20,7 @@
   }
 }
 
-
+/* 
 table {
   border-collapse: collapse;
   border-spacing: 0px;
@@ -45,7 +45,7 @@ th, td {
   height: 120px;
   margin: 0px;
   padding: 0px;
-  /* border: 1px solid black; */
+   border: 1px solid black; 
   display:block;
 }
 th .adjustable, 
@@ -55,4 +55,32 @@ td .adjustable {
   height: auto;
   min-height: 20px;
   min-width: 20px;
+} */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #000;
+  padding: 8px;
+  position: relative;
+  text-overflow: clip;
+}
+
+th {
+  background-color: #f4f4f4;
+  position: relative;
+}
+
+.resizer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 5px;
+  height: 100%;
+  cursor: col-resize;
+  background-color: beige;
+  /* user-select: none; */
 }

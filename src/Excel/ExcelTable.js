@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react"
+import { useEffect,  useState } from "react"
 import * as XLSX from 'xlsx';
 import "./ExcelTable.css"
 
@@ -10,6 +10,11 @@ export default function ExcelTable({ sheets, sheetColMap, joinedRows, setJoinedR
     const [table, setTable] = useState(new Map())   //map <sheet name, array of object representing cell
     //cell {cellVal, sheetName, ind, selected}
 
+
+    const [columnWidths, setColumnWidths] = useState([...sheets.keys()].map(sheetName => 200))
+
+
+    //set up table data 
     useEffect(() => {
         // create table on loading of page
         //find max column len
@@ -31,7 +36,9 @@ export default function ExcelTable({ sheets, sheetColMap, joinedRows, setJoinedR
         )
         )
         setTable(ntable);
+
     }, [sheets, sheetColMap])
+
 
     const handleSubmit = (e) => {
         //add new joinedRow object to joinedRows array, update cells joined, and clear inputs
@@ -105,6 +112,30 @@ export default function ExcelTable({ sheets, sheetColMap, joinedRows, setJoinedR
 
     }
 
+    const handleMouseDown = (index, event) => {
+        console.log('down', index)
+        const startX = event.clientX;
+        const startWidth = columnWidths[index];
+
+        const onMouseMove = (event) => {
+            console.log('move', index, event.clientX)
+            document.body.style.cursor = 'col-resize';
+            const newWidths = [...columnWidths];
+            newWidths[index] = Math.max(startWidth + event.clientX - startX, 50); // Ensure a minimum width
+            setColumnWidths(newWidths);
+        };
+
+        const onMouseUp = () => {
+            console.log('up', index)
+            document.body.style.cursor = '';
+            window.removeEventListener('mousemove', onMouseMove);
+            window.removeEventListener('mouseup', onMouseUp);
+        };
+
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+    };
+
     return (
         <>
             <button onClick={exportSheet}>Export sheet</button>
@@ -122,8 +153,7 @@ export default function ExcelTable({ sheets, sheetColMap, joinedRows, setJoinedR
 
             </p>
             <div>
-                <h3>asdf</h3>
-                <table>
+                <table >
                     <thead>
                         <tr className="followHeader">
                             {/*sheet Names*/}
@@ -135,11 +165,22 @@ export default function ExcelTable({ sheets, sheetColMap, joinedRows, setJoinedR
                                     <button type='submit'>Join Selected Rows</button>
                                 </form>
                             </th>
-                            {[...sheets.keys()].map(sheetName =>
-                                <th scope="col">
-                                    <div className="adjustable">
-                                        {sheetName}
-                                    </div>
+                            {[...sheets.keys()].map((sheetName, index) =>
+                                <th
+                                    scope="col"
+                                    style={{ width: columnWidths[index] + 'px' }}>
+                                    {sheetName}
+                                    <div
+                                        style={{
+                                            display: 'inline-block',
+                                            width: '10px',
+                                            position: 'absolute',
+                                            right: 0,
+                                            top: 0,
+                                            bottom: 0,
+                                        }}
+                                        onMouseDown={(event) => handleMouseDown(index, event)}
+                                    />
                                 </th>)}
                         </tr>
                     </thead>
@@ -162,16 +203,14 @@ export default function ExcelTable({ sheets, sheetColMap, joinedRows, setJoinedR
                                     </button>
                                     {` ${row.name}`}
                                 </th>
-                                {[...sheets.keys()].map(sheetName =>
-                                    (row.cols.has(sheetName)) ?
-                                        (<td>
-                                            <div className="adjustable">
-                                                {row.cols.get(sheetName).cellVal}
-                                            </div>
-                                        </td>) :
-                                        (<td>
-                                            <div className="adjustable" />
-                                        </td>)
+                                {[...sheets.keys()].map((sheetName, index) =>
+                                    <td style={{ width: columnWidths[index], wordBreak: 'break-word' }}>
+                                        {
+                                            (row.cols.has(sheetName)) ?
+                                                (row.cols.get(sheetName).cellVal) :
+                                                ("")
+                                        }
+                                    </td>
                                 )}
                             </tr>
                         )}
@@ -183,51 +222,41 @@ export default function ExcelTable({ sheets, sheetColMap, joinedRows, setJoinedR
                                 <tr>
                                     <th scope="row">row {ind + 1}</th>
                                     {
-                                        [...table.keys()].map(sheetName => //for each sheet
+                                        [...table.keys()].map((sheetName, index) => //for each sheet
+
                                             (table.get(sheetName).length > ind
                                                 && table.get(sheetName)[ind] !== undefined
                                                 && table.get(sheetName)[ind] !== null) ? //if the sheet has a value at the index
                                                 (
-                                                    (table.get(sheetName)[ind].selected !== 0) ? //if we have already selected, cross it out
-
-                                                        (
-                                                            <td
-                                                                onClick={(e) => handleSelect(e, table.get(sheetName)[ind])}
-                                                                bgcolor={(selRows.get(sheetName) === table.get(sheetName)[ind]) ? ('gray') : ("white")
-                                                                }
-                                                            >
-                                                                <div className="adjustable" >
-
-                                                                    <s>
-                                                                        {table.get(sheetName)[ind].cellVal}
-                                                                    </s>
-                                                                </div>
-                                                            </td>
-                                                        ) : ( // if not selected, display as normal
-                                                            <td
-                                                                onClick={(e) => handleSelect(e, table.get(sheetName)[ind])}
-                                                                bgcolor={(selRows.get(sheetName) === table.get(sheetName)[ind]) ? ('gray') : ("white")
-                                                                }
-                                                            >
-                                                                <div className="adjustable" >
-
+                                                    <td style={{ width: columnWidths[index], wordBreak: 'break-word' }}
+                                                        onClick={(e) => handleSelect(e, table.get(sheetName)[ind])}
+                                                        bgcolor={(selRows.get(sheetName) === table.get(sheetName)[ind]) ? ('gray') : ("white")}
+                                                    >
+                                                        {
+                                                        (table.get(sheetName)[ind].selected !== 0) ? //if we have already selected, cross it out
+                                                            (
+                                                                <s>
                                                                     {table.get(sheetName)[ind].cellVal}
-                                                                </div>
-                                                            </td>
-                                                        )
-                                                ) : ( // if no value, just empty
-                                                    <td>
-                                                        <div className="adjustable" />
+                                                                </s>
+
+                                                            ) : ( // if not selected, display as normal
+                                                                table.get(sheetName)[ind].cellVal 
+                                                            )
+                                                        }
                                                     </td>
+                                                ) : ( // if no value, just empty
+                                                    <td style={{ width: columnWidths[index], wordBreak: 'break-word' }}/>
                                                 )
+
+
                                         )
                                     }
                                 </tr>
                             )
                         }
                     </tfoot>
-                </table>
-            </div>
+                </table >
+            </div >
         </>
     )
 

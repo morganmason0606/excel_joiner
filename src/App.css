@@ -48,3 +48,7 @@ p {
   text-align: left;
   margin-left: 1em;
 }
+
+.joinedRows{
+  background-color: aquamarine;
+}
