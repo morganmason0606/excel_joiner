@@ -167,7 +167,7 @@ export default function ExcelTable({ sheets, sheetColMap, joinedRows, setJoinedR
                                 Select cells and Join
                                 <form onSubmit={handleSubmit}>
 
-                                    <input type="text" placeholder="new column name" value={inputName} onChange={(e) => setInputName(e.target.value)} />
+                                    <input type="text" placeholder="new row name" value={inputName} onChange={(e) => setInputName(e.target.value)} />
                                     <button type='submit'>Join Selected Rows</button>
                                 </form>
                             </th>
@@ -202,18 +202,35 @@ export default function ExcelTable({ sheets, sheetColMap, joinedRows, setJoinedR
                         {joinedRows.map((row, ind) =>
                             <tr>
                                 <th scope="row">
+                                    {` ${row.name}`}
+                                    <br/>
                                     <button
                                         onClick={() => {
                                             //filter out selected row and update the row's cells
                                             row.cols.forEach(cell => cell.selected -= 1);
                                             const newRows = joinedRows.filter((val, i) => i !== ind)
                                             setJoinedRows(newRows)
-
                                         }}
                                     >
                                         delete
                                     </button>
-                                    {` ${row.name}`}
+                                    <button onClick={()=>{
+                                        const winInput = window.prompt("Rename row:", row.name);
+                                        if(winInput !== null){
+                                            const newRows = joinedRows.map((row2, ind2)=>{
+                                                if (ind === ind2){
+                                                    const newRow = row2
+                                                    newRow.name = winInput
+                                                    return newRow
+                                                }else{
+                                                    return row2
+                                                }
+                                            })
+                                            setJoinedRows(newRows)
+                                        }
+                                    }}>
+                                        update
+                                    </button>
                                 </th>
                                 {[...sheets.keys()].map((sheetName, index) =>
                                     <td
